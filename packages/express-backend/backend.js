@@ -50,11 +50,8 @@ const addUser = (user) => {
 };
 
 const deleteUser = (id_to_delete) => {
+  if (findUserById(id_to_delete) == undefined) return false;
   const new_list = users["users_list"].filter((user) => user.id != id_to_delete);
-  if (users["users_list"] === new_list)
-  {
-    return false;
-  }
   users["users_list"] = new_list;
   return true;
 };
