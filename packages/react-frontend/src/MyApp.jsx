@@ -1,33 +1,85 @@
 // src/MyApp.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Table from "./Table";
 import Form from "./form";
 
 
-  function MyApp() {
-    const [characters, setCharacters] = useState([
-      ]);
+// src/MyApp.js (a new inner function inside MyApp())
 
-      function removeOneCharacter(index) {
-        const updated = characters.filter((character, i) => {
-          return i !== index;
+function fetchUsers() {
+  const promise = fetch("http://localhost:8000/users");
+  return promise;
+}
+
+function deleteUser(userId) {
+  const promise = fetch("http://localhost:8000/users/"+userId,
+                       {method: "DELETE", 
+                        headers: { "Content-Type": "application/json",
+                        },
+                       });
+  return promise;
+}
+
+function MyApp() {
+  const [characters, setCharacters] = useState([
+    ]);
+    function removeOneCharacter(index) {
+      deleteUser(characters[index].id)
+      .then((res) => res.status == 204 ?
+        index: undefined)
+      .then((successful_index) => {
+        const updated = characters.filter((characters, i) => {
+          return i !== successful_index;
         });
-        setCharacters(updated);
-      }
+        setCharacters(updated)
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+    }
 
-      function updateList(person) {
-        setCharacters([...characters, person]);
-      }
+    function updateList(person) {
+      setCharacters([...characters, person]);
+    }
 
-      return (
-        <div className="container">
-          <Table
-            characterData={characters}
-            removeCharacter={removeOneCharacter}
-          />
-          <Form handleSubmit={updateList} />
-        </div>
-      );
+    useEffect(() => {
+      fetchUsers()
+        .then((res) => res.json())
+        .then((json) => setCharacters(json["users_list"]))
+        .catch((error) => { console.log(error); });
+    }, [] );
+
+    function postUser(person) {
+      const promise = fetch("Http://localhost:8000/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(person),
+      });
+  
+      return promise;
+    }
+
+    function updateList(person) {
+      postUser(person)
+        .then((res) => res.status == 201 ?
+          res.json(): undefined)
+        .then((json) => setCharacters([...characters, json]))
+        .catch((error) => {
+          console.log(error);
+        })
   }
+
+    return (
+      <div className="container">
+        <Table
+          characterData={characters}
+          removeCharacter={removeOneCharacter}
+        />
+        <Form handleSubmit={updateList} />
+      </div>
+    );
+}
 
 export default MyApp;

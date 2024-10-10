@@ -1,5 +1,6 @@
 // backend.js
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
@@ -49,8 +50,7 @@ const addUser = (user) => {
 };
 
 const deleteUser = (id_to_delete) => {
-  const new_list = users["users_list"].filter((user) => user.id != id_to_delete.id);
-  console.log(users["users_list"] == new_list)
+  const new_list = users["users_list"].filter((user) => user.id != id_to_delete);
   if (users["users_list"] === new_list)
   {
     return false;
@@ -64,6 +64,7 @@ const find_entry_by_name_and_job = (name, job) => {
   return new_list;
 }
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -101,17 +102,22 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
+  userToAdd.id = Math.floor(Math.random() * 100000)
   addUser(userToAdd);
-  res.send();
+  res.status(201)
+  res.send(userToAdd);
 });
 
-app.delete("/users", (req, res) => {
-  const userId = req.body;
+app.delete("/users/:id", (req, res) => {
+  const userId = req.params["id"];
   if (!deleteUser(userId))
   {
-    res.status(404);
+    res.status(404).send();
   }
-  res.send();
+  else
+  {
+    res.status(204).send()
+  }
 });
 
 app.get("/users/:name/:job", (req, res) => {
