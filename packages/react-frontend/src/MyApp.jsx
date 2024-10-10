@@ -15,13 +15,17 @@ import Form from "./form";
         setCharacters(updated);
       }
 
+      function updateList(person) {
+        setCharacters([...characters, person]);
+      }
+
       return (
         <div className="container">
           <Table
             characterData={characters}
             removeCharacter={removeOneCharacter}
           />
-          <Form />
+          <Form handleSubmit={updateList} />
         </div>
       );
   }

@@ -4,13 +4,20 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon packages/express-backend/backend.js"
+    "dev": "npm -w express-backend npx nodemon backend.js",
+    "frontend": "npm -w react-frontend vite"
+
   },
   "author": "",
   "license": "ISC",
-  "description": ""
-  ,
+  "description": "",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
 }
