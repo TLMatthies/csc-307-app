@@ -23,8 +23,9 @@ function deleteUser(userId) {
 function MyApp() {
   const [characters, setCharacters] = useState([
     ]);
+    console.log("MyApp" + characters);
     function removeOneCharacter(index) {
-      deleteUser(characters[index].id)
+      deleteUser(characters[index]._id)
       .then((res) => res.status == 204 ?
         index: undefined)
       .then((successful_index) => {
@@ -41,12 +42,11 @@ function MyApp() {
 
     useEffect(() => {
       fetchUsers()
-        .then((res) => {
-          setCharacters(res);
+        .then((res) => res.json())
+        .then((json) => {
+          console.log(json);
+          setCharacters(json);
         })
-        //.then((json) => {
-        //  setCharacters(json);
-        //})
         .catch((error) => { 
           console.log("Error");
           console.log(error); });
@@ -76,6 +76,7 @@ function MyApp() {
         })
   }
 
+  console.log("Characters: " + characters);
     return (
       <div className="container">
         <Table
