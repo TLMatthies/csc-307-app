@@ -31,6 +31,7 @@ function MyApp() {
         const updated = characters.filter((characters, i) => {
           return i !== successful_index;
         });
+        console.log("Delete");
         setCharacters(updated)
       })
       .catch((error) => {
@@ -38,16 +39,18 @@ function MyApp() {
       })
     }
 
-    function updateList(person) {
-      setCharacters([...characters, person]);
-    }
-
     useEffect(() => {
       fetchUsers()
-        .then((res) => res.json())
-        .then((json) => setCharacters(json["users_list"]))
-        .catch((error) => { console.log(error); });
-    }, [] );
+        .then((res) => {
+          setCharacters(res);
+        })
+        //.then((json) => {
+        //  setCharacters(json);
+        //})
+        .catch((error) => { 
+          console.log("Error");
+          console.log(error); });
+    });
 
     function postUser(person) {
       const promise = fetch("Http://localhost:8000/users", {
@@ -65,7 +68,9 @@ function MyApp() {
       postUser(person)
         .then((res) => res.status == 201 ?
           res.json(): undefined)
-        .then((json) => setCharacters([...characters, json]))
+        .then((json) => {
+          console.log(json);
+          setCharacters([...characters, json]);})
         .catch((error) => {
           console.log(error);
         })

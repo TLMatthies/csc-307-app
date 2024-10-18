@@ -1,6 +1,7 @@
 // backend.js
 import express from "express";
 import cors from "cors";
+import services from "./models/user-services.js"
 
 const app = express();
 const port = 8000;
@@ -36,30 +37,40 @@ const users = {
 };
 
 const findUserByName = (name) => {
-  return users["users_list"].filter(
-    (user) => user["name"] === name
-  );
+  services.findUserByName(name)
+  .then((result) => {
+    if (result) return result;
+    else return undefined;
+  })
+  .catch((error) => 
+    console.log(error.name));
 };
 
-const findUserById = (id) =>
-  users["users_list"].find((user) => user["id"] === id);
+const findUserById = (id) => {
+  services.findUserById(id)
+  .then((result) => {
+    if (result) return result;
+    else return undefined;
+  })
+  .catch((error) => 
+    console.log(error.name));
+};
 
 const addUser = (user) => {
-  users["users_list"].push(user);
-  return user;
+  services.addUser(user)
+  .then((result) => {
+    return result._id;})
+  .catch((error) => console.log(error.name));
 };
 
 const deleteUser = (id_to_delete) => {
-  if (findUserById(id_to_delete) == undefined) return false;
-  const new_list = users["users_list"].filter((user) => user.id != id_to_delete);
-  users["users_list"] = new_list;
-  return true;
+  services.deleteUserById(id_to_delete)
+  .then((result) => {
+    if (result) return true;
+    else return false;
+  })
+  .catch((error) => console.log(error.name));
 };
-
-const find_entry_by_name_and_job = (name, job) => {
-  const new_list = users["users_list"].filter((user) => user.name == name & user.job == job);
-  return new_list;
-}
 
 app.use(cors());
 app.use(express.json());
@@ -78,13 +89,13 @@ app.listen(port, () => {
 app.get("/users", (req, res) => {
   const name = req.query.name;
   const job = req.query.job;
-  if (name != undefined) {
-    let result = findUserByName(name);
-    result = { users_list: result };
-    res.send(result);
-  } else {
-    res.send(users);
-  }
+  services.getUsers(name, job)
+  .then((result) =>{
+    console.log(result)
+    if (result) res.status(200).send(result);
+    else res.status(404).send();
+  })
+  .catch((error) => console.log(error));
 });
 
 app.get("/users/:id", (req, res) => {
@@ -99,8 +110,7 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  userToAdd.id = Math.floor(Math.random() * 100000)
-  addUser(userToAdd);
+  userToAdd.id = addUser(userToAdd);
   res.status(201)
   res.send(userToAdd);
 });
